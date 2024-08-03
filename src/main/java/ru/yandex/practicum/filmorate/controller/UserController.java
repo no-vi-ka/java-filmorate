@@ -16,11 +16,11 @@ import java.util.Map;
 @RestController
 @RequestMapping("/users")
 public class UserController {
+    private final Logger log = LoggerFactory.getLogger(UserController.class);
+
     private final Map<Long, User> users = new HashMap<>();
 
     private long idGenerator = 1;
-
-    private final static Logger log = LoggerFactory.getLogger(UserController.class);
 
     @GetMapping
     public Collection<User> findAll() {

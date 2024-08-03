@@ -15,13 +15,13 @@ import java.util.Map;
 @RestController
 @RequestMapping("/films")
 public class FilmController {
+    private final static Logger log = LoggerFactory.getLogger(FilmController.class);
+
     private final Map<Long, Film> films = new HashMap<>();
 
     private long idGenerator = 1;
 
     private final LocalDate theEarliestFilmDate = LocalDate.of(1895, 12, 28);
-
-    private final static Logger log = LoggerFactory.getLogger(FilmController.class);
 
     @GetMapping
     public Collection<Film> findAll() {

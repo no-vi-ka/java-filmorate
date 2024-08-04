@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.helpers.EqualityHelper;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
@@ -22,6 +23,8 @@ public class UserController {
 
     private long idGenerator = 1;
 
+    EqualityHelper helper = new EqualityHelper();
+
     @GetMapping
     public Collection<User> findAll() {
         log.info("Обрабатывается GET запрос от клиента.");
@@ -31,15 +34,12 @@ public class UserController {
     @PostMapping
     public User createUser(@RequestBody User newUser) {
         log.info("Обрабатывается POST запрос от клиента.");
-        // проверяем выполнение необходимых условий
         checkUser(newUser);
         log.info("Данные о пользователе (email, логин, имя пользователя, дата рождения) корректны.");
         if (newUser.getName() == null || newUser.getName().isBlank()) {
             newUser.setName(newUser.getLogin());
         }
-        // формируем дополнительные данные
         newUser.setId(idGenerator++);
-        // сохраняем новую публикацию в памяти приложения
         users.put(newUser.getId(), newUser);
         log.info("Информация о пользователе успешно сохранена и добавлена к списку пользователей.");
         return newUser;
@@ -48,7 +48,6 @@ public class UserController {
     @PutMapping
     public User updateUser(@RequestBody User userToUpdate) {
         log.info("Обрабатывается PUT запрос от клиента.");
-        // проверяем необходимые условия
         checkUser(userToUpdate);
         log.info("Данные о пользователе (email, логин, имя пользователя, дата рождения) корректны.");
         if (userToUpdate.getId() <= 0) {
@@ -60,20 +59,20 @@ public class UserController {
             throw new NotFoundException("Пользователь с id = " + userToUpdate.getId() + " не найден.");
         }
         User userFromMap = users.get(userToUpdate.getId());
-        if (!userFromMap.getEmail().equals(userToUpdate.getEmail())) {
+        if (!helper.equality(userFromMap.getEmail(), userToUpdate.getEmail())) {
             userFromMap.setEmail(userToUpdate.getEmail());
         }
-        if (!userFromMap.getLogin().equals(userToUpdate.getLogin())) {
+        if (!helper.equality(userFromMap.getLogin(), userToUpdate.getLogin())) {
             userFromMap.setLogin(userToUpdate.getLogin());
         }
-        if (!userFromMap.getName().equals(userToUpdate.getName())) {
+        if (!helper.equality(userFromMap.getName(), userToUpdate.getName())) {
             if (userToUpdate.getName() == null || userToUpdate.getName().isBlank()) {
                 userFromMap.setName(userToUpdate.getLogin());
             } else {
                 userFromMap.setName(userToUpdate.getName());
             }
         }
-        if (!userFromMap.getBirthday().equals(userToUpdate.getBirthday())) {
+        if (!helper.equality(userFromMap.getBirthday(), userToUpdate.getBirthday())) {
             userFromMap.setBirthday(userToUpdate.getBirthday());
         }
         users.put(userFromMap.getId(), userFromMap);
@@ -81,7 +80,7 @@ public class UserController {
         return userFromMap;
     }
 
-    public void checkUser(User userToCheck) {
+    private void checkUser(User userToCheck) {
         if (userToCheck.getEmail() == null || userToCheck.getEmail().isBlank() || !userToCheck.getEmail().contains("@")) {
             log.error("Ошибка: введён некорректный email.");
             throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @.");

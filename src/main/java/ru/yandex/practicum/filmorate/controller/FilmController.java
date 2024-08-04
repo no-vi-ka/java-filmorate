@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.helpers.EqualityHelper;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
@@ -23,6 +24,8 @@ public class FilmController {
 
     private final LocalDate theEarliestFilmDate = LocalDate.of(1895, 12, 28);
 
+    EqualityHelper helper = new EqualityHelper();
+
     @GetMapping
     public Collection<Film> findAll() {
         log.info("Обрабатывается GET запрос от клиента.");
@@ -32,12 +35,9 @@ public class FilmController {
     @PostMapping
     public Film createFilm(@RequestBody Film newFilm) {
         log.info("Обрабатывается POST запрос от клиента.");
-        // проверяем выполнение необходимых условий
         checkFilm(newFilm);
         log.info("Данные о фильме (название, описание, дата выхода, продолжительность) корректны.");
-        // формируем дополнительные данные
         newFilm.setId(idGenerator++);
-        // сохраняем новую публикацию в памяти приложения
         films.put(newFilm.getId(), newFilm);
         log.info("Информация о фильме успешно сохранена и добавлена к списку фильмов.");
         return newFilm;
@@ -46,7 +46,6 @@ public class FilmController {
     @PutMapping
     public Film updateFilm(@RequestBody Film filmToUpdate) {
         log.info("Обрабатывается PUT запрос от клиента.");
-        // проверяем необходимые условия
         checkFilm(filmToUpdate);
         log.info("Данные о фильме (название, описание, дата выхода, продолжительность) корректны.");
         if (filmToUpdate.getId() <= 0) {
@@ -58,16 +57,16 @@ public class FilmController {
             throw new NotFoundException("Пост с id = " + filmToUpdate.getId() + " не найден.");
         }
         Film filmFromMap = films.get(filmToUpdate.getId());
-        if (!filmFromMap.getName().equals(filmToUpdate.getName())) {
+        if (!helper.equality(filmFromMap.getName(), filmToUpdate.getName())) {
             filmFromMap.setName(filmToUpdate.getName());
         }
-        if (!filmFromMap.getDescription().equals(filmToUpdate.getDescription())) {
+        if (!helper.equality(filmFromMap.getDescription(), filmToUpdate.getDescription())) {
             filmFromMap.setDescription(filmToUpdate.getDescription());
         }
-        if (!filmFromMap.getReleaseDate().equals(filmToUpdate.getReleaseDate())) {
+        if (!helper.equality(filmFromMap.getReleaseDate(), filmToUpdate.getReleaseDate())) {
             filmFromMap.setReleaseDate(filmToUpdate.getReleaseDate());
         }
-        if (filmFromMap.getDuration() != filmToUpdate.getDuration()) {
+        if (!helper.equality(filmFromMap.getDuration(), filmToUpdate.getDuration())) {
             filmFromMap.setDuration(filmToUpdate.getDuration());
         }
         films.put(filmFromMap.getId(), filmFromMap);
@@ -75,7 +74,7 @@ public class FilmController {
         return filmFromMap;
     }
 
-    public void checkFilm(Film filmToCheck) {
+    private void checkFilm(Film filmToCheck) {
         if (filmToCheck.getName() == null || filmToCheck.getName().isBlank()) {
             log.error("Ошибка: введено некорректное название фильма.");
             throw new ValidationException("Название не может быть пустым.");

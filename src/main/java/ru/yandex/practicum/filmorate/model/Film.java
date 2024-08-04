@@ -4,9 +4,6 @@ import lombok.*;
 
 import java.time.LocalDate;
 
-/**
- * Film.
- */
 @Data
 @Builder(toBuilder = true)
 public class Film {

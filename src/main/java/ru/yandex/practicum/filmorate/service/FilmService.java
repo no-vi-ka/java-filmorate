@@ -41,9 +41,6 @@ public class FilmService {
         userStorage.checkUser(user);
         film.getLikeCounts().add(id);
         user.getLikedFilmsId().add(filmId);
-        if (filmId == 45) {
-            throw new RuntimeException("45 id.");
-        }
     }
 
 

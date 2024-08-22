@@ -45,7 +45,6 @@ public class InMemoryUserStorage implements UserStorage {
         }
         newUser.setId(idGenerator++);
         users.put(newUser.getId(), newUser);
-       // addUserToMap(newUser);
         log.info("Информация о пользователе успешно сохранена и добавлена к списку пользователей.");
         return newUser;
     }
@@ -75,7 +74,6 @@ public class InMemoryUserStorage implements UserStorage {
         userFromMap.setBirthday(userToUpdate.getBirthday());
         userFromMap.setFriendsId(userToUpdate.getFriendsId());
         users.put(userFromMap.getId(), userFromMap);
-   //     addUserToMap(userFromMap);
         log.info("Данные о пользователе успешно обновлены.");
         return userFromMap;
     }

@@ -31,6 +31,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User getUserById(long id) {
+        log.info("Обрабатывается GET запрос от клиента.");
         return users.get(id);
     }
 
@@ -43,7 +44,8 @@ public class InMemoryUserStorage implements UserStorage {
             newUser.setName(newUser.getLogin());
         }
         newUser.setId(idGenerator++);
-        addUserToMap(newUser);
+        users.put(newUser.getId(), newUser);
+       // addUserToMap(newUser);
         log.info("Информация о пользователе успешно сохранена и добавлена к списку пользователей.");
         return newUser;
     }
@@ -72,7 +74,8 @@ public class InMemoryUserStorage implements UserStorage {
         }
         userFromMap.setBirthday(userToUpdate.getBirthday());
         userFromMap.setFriendsId(userToUpdate.getFriendsId());
-        addUserToMap(userFromMap);
+        users.put(userFromMap.getId(), userFromMap);
+   //     addUserToMap(userFromMap);
         log.info("Данные о пользователе успешно обновлены.");
         return userFromMap;
     }

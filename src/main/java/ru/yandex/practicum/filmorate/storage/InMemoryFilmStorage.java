@@ -24,6 +24,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     private final LocalDate theEarliestFilmDate = LocalDate.of(1895, 12, 28);
 
 
+
     @Override
     public Collection<Film> findAll() {
         log.info("Обрабатывается GET запрос от клиента.");
@@ -32,6 +33,13 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film getFilmById(Long id) {
+        log.info("Обрабатывается GET запрос от клиента.");
+        if (id <= 0) {
+            throw new ValidationException("The id cannot be negative.");
+        }
+        if (!films.containsKey(id)) {
+            throw new NotFoundException("Фильм с id = " + id + " не найден.");
+        }
         return films.get(id);
     }
 
@@ -72,10 +80,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         return filmFromMap;
     }
 
-    @Override
-    public void addFilmToMap(Film film) {
-        films.put(film.getId(), film);
-    }
+
 
     public void checkFilm(Film filmToCheck) {
         if (filmToCheck.getName() == null || filmToCheck.getName().isBlank()) {

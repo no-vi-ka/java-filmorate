@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.ArrayList;
@@ -15,9 +16,9 @@ import java.util.Set;
 
 @Service
 public class UserService {
-    private final UserStorage userStorage;
+    private final InMemoryUserStorage userStorage;
 
-    public UserService(UserStorage userStorage) {
+    public UserService(InMemoryUserStorage userStorage) {
         this.userStorage = userStorage;
     }
 

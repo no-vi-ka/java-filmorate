@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -19,38 +20,51 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
 
+    @Autowired
     public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
     }
 
-    public void addLike(@PathVariable long id, @PathVariable long userId) {
-        if ((userId <= 0) || (id <= 0)) {
+    public void addLike(long filmId, long id) {
+        if ((id <= 0) || (filmId <= 0)) {
             throw new ValidationException("The id cannot be negative.");
         }
-        if (filmStorage.getFilmById(id) == null) {
-            throw new NotFoundException("Фильм с id = " + id + " не найден.");
+        if (filmStorage.getFilmById(filmId) == null) {
+            throw new NotFoundException("Фильм с id = " + filmId + " не найден.");
         }
         if (userStorage.getUserById(id) == null) {
-            throw new NotFoundException("Пользователь с id = " + userId + " не найден.");
+            throw new NotFoundException("Пользователь с id = " + id + " не найден.");
         }
-        Film film = filmStorage.getFilmById(id);
+//        filmStorage.getFilmById(filmId).getLikeCounts().add(id);
+//        userStorage.getUserById(id).getLikedFilmsId().add(filmId);
+
+
+//        filmStorage.getFilmById(id).addLike(userId);
+//        userStorage.getUserById(userId).addLikedFilm(id);
+
+
+        Film film = filmStorage.getFilmById(filmId);
         filmStorage.checkFilm(film);
-        User user = userStorage.getUserById(userId);
+        User user = userStorage.getUserById(id);
         userStorage.checkUser(user);
-        film.getLikeCounts().add(userId);
-        user.getLikedFilmsId().add(id);
+        film.getLikeCounts().add(id);
+        user.getLikedFilmsId().add(filmId);
+        //user.addLikedFilm(id);
+        if (filmId == 45) {
+            throw new RuntimeException("45 id.");
+        }
     }
 
 
-    public void deleteLike(@PathVariable long id, @PathVariable long userId) {
+    public void deleteLike(long id, long userId) {
         if ((userId <= 0) || (id <= 0)) {
             throw new ValidationException("The id cannot be negative.");
         }
         if (filmStorage.getFilmById(id) == null) {
             throw new NotFoundException("Фильм с id = " + id + " не найден.");
         }
-        if (userStorage.getUserById(id) == null) {
+        if (userStorage.getUserById(userId) == null) {
             throw new NotFoundException("Пользователь с id = " + userId + " не найден.");
         }
         Film film = filmStorage.getFilmById(id);

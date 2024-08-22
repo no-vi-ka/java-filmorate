@@ -13,7 +13,5 @@ public interface FilmStorage {
 
     public Film updateFilm(Film filmToUpdate);
 
-    public void addFilmToMap(Film film);
-
     public void checkFilm(Film filmToCheck);
 }

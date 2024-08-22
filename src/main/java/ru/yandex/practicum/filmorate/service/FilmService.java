@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -36,21 +35,12 @@ public class FilmService {
         if (userStorage.getUserById(id) == null) {
             throw new NotFoundException("Пользователь с id = " + id + " не найден.");
         }
-//        filmStorage.getFilmById(filmId).getLikeCounts().add(id);
-//        userStorage.getUserById(id).getLikedFilmsId().add(filmId);
-
-
-//        filmStorage.getFilmById(id).addLike(userId);
-//        userStorage.getUserById(userId).addLikedFilm(id);
-
-
         Film film = filmStorage.getFilmById(filmId);
         filmStorage.checkFilm(film);
         User user = userStorage.getUserById(id);
         userStorage.checkUser(user);
         film.getLikeCounts().add(id);
         user.getLikedFilmsId().add(filmId);
-        //user.addLikedFilm(id);
         if (filmId == 45) {
             throw new RuntimeException("45 id.");
         }

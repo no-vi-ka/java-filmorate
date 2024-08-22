@@ -24,7 +24,6 @@ public class InMemoryFilmStorage implements FilmStorage {
     private final LocalDate theEarliestFilmDate = LocalDate.of(1895, 12, 28);
 
 
-
     @Override
     public Collection<Film> findAll() {
         log.info("Обрабатывается GET запрос от клиента.");
@@ -79,7 +78,6 @@ public class InMemoryFilmStorage implements FilmStorage {
         log.info("Данные о фильме успешно обновлены.");
         return filmFromMap;
     }
-
 
 
     public void checkFilm(Film filmToCheck) {

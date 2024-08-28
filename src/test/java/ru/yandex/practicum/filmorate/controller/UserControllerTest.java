@@ -5,11 +5,13 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 
 public class UserControllerTest {
-    UserController controller = new UserController();
+    private final UserStorage userStorage = new InMemoryUserStorage();
 
     @Test
     public void shouldCreateNewUserAndGiveItBack() {
@@ -19,8 +21,8 @@ public class UserControllerTest {
                 .name("no.vi.ka")
                 .birthday(LocalDate.of(2000, 03, 10))
                 .build();
-        Assertions.assertDoesNotThrow(() -> controller.createUser(user));
-        Assertions.assertNotNull(controller.findAll());
+        Assertions.assertDoesNotThrow(() -> userStorage.createUser(user));
+        Assertions.assertNotNull(userStorage.findAll());
     }
 
     @Test
@@ -31,7 +33,7 @@ public class UserControllerTest {
                 .name("")
                 .birthday(LocalDate.of(2000, 03, 10))
                 .build();
-        User createdUser = controller.createUser(user);
+        User createdUser = userStorage.createUser(user);
         Assertions.assertEquals(createdUser.getLogin(), createdUser.getName());
     }
 
@@ -43,8 +45,7 @@ public class UserControllerTest {
                 .name("no.vi.ka")
                 .birthday(LocalDate.of(2000, 03, 10))
                 .build();
-       // User user = new User("no.vi.ka.yandex.ru", "no-vi-ka", "no.vi.ka", LocalDate.of(2000, 03, 10));
-        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> controller.createUser(user));
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> userStorage.createUser(user));
         Assertions.assertEquals("Электронная почта не может быть пустой и должна содержать символ @.", exception.getMessage());
     }
 
@@ -56,8 +57,7 @@ public class UserControllerTest {
                 .name("no.vi.ka")
                 .birthday(LocalDate.of(2000, 03, 10))
                 .build();
-       // User user = new User("", "no-vi-ka", "no.vi.ka", LocalDate.of(2000, 03, 10));
-        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> controller.createUser(user));
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> userStorage.createUser(user));
         Assertions.assertEquals("Электронная почта не может быть пустой и должна содержать символ @.", exception.getMessage());
     }
 
@@ -69,8 +69,7 @@ public class UserControllerTest {
                 .name("no.vi.ka")
                 .birthday(LocalDate.of(2000, 03, 10))
                 .build();
-        //User user = new User("no.vi.ka@yandex.ru", "", "no.vi.ka", LocalDate.of(2000, 03, 10));
-        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> controller.createUser(user));
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> userStorage.createUser(user));
         Assertions.assertEquals("Логин не может быть пустым и содержать пробелы.", exception.getMessage());
     }
 
@@ -82,8 +81,7 @@ public class UserControllerTest {
                 .name("no.vi.ka")
                 .birthday(LocalDate.of(2000, 03, 10))
                 .build();
-       // User user = new User("no.vi.ka@yandex.ru", "no vi ka", "no.vi.ka", LocalDate.of(2000, 03, 10));
-        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> controller.createUser(user));
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> userStorage.createUser(user));
         Assertions.assertEquals("Логин не может быть пустым и содержать пробелы.", exception.getMessage());
     }
 
@@ -95,8 +93,7 @@ public class UserControllerTest {
                 .name("no.vi.ka")
                 .birthday(LocalDate.of(2100, 03, 10))
                 .build();
-        //User user = new User("no.vi.ka@yandex.ru", "no-vi-ka", "no.vi.ka", LocalDate.of(2100, 03, 10));
-        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> controller.createUser(user));
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> userStorage.createUser(user));
         Assertions.assertEquals("Дата рождения не может быть в будущем.", exception.getMessage());
     }
 
@@ -108,8 +105,7 @@ public class UserControllerTest {
                 .name("no.vi.ka")
                 .birthday(LocalDate.of(2000, 03, 10))
                 .build();
-      //  User user = new User("no.vi.ka@yandex.ru", "no-vi-ka", "no.vi.ka", LocalDate.of(2000, 03, 10));
-        User defaultUser = controller.createUser(user);
+        User defaultUser = userStorage.createUser(user);
         User userWithUpdates = User.builder()
                 .id(1)
                 .email("no.vi.ka@yandex.ru")
@@ -117,8 +113,7 @@ public class UserControllerTest {
                 .name("no.vi.ka")
                 .birthday(LocalDate.of(2000, 03, 10))
                 .build();
-        //User userWithUpdates = new User(1, "no.vi.ka.2000@yandex.ru", "no-vi-ka", "no.vi.ka", LocalDate.of(2000, 03, 10));
-        Assertions.assertDoesNotThrow(() -> controller.updateUser(userWithUpdates));
+        Assertions.assertDoesNotThrow(() -> userStorage.updateUser(userWithUpdates));
         Assertions.assertEquals(userWithUpdates, defaultUser);
     }
 
@@ -130,18 +125,14 @@ public class UserControllerTest {
                 .name("no.vi.ka")
                 .birthday(LocalDate.of(2000, 03, 10))
                 .build();
-        //  User user = new User("no.vi.ka@yandex.ru", "no-vi-ka", "no.vi.ka", LocalDate.of(2000, 03, 10));
-        User defaultUser = controller.createUser(user);
+        User defaultUser = userStorage.createUser(user);
         User userWithUpdates = User.builder()
                 .email("no.vi.ka@yandex.ru")
                 .login("no-vi-ka")
                 .name("no.vi.ka")
                 .birthday(LocalDate.of(2000, 03, 10))
                 .build();
-//        User user = new User("no.vi.ka@yandex.ru", "no-vi-ka", "no.vi.ka", LocalDate.of(2000, 03, 10));
-//        User defaultUser = controller.createUser(user);
-//        User userWithUpdates = new User("no.vi.ka.2000@yandex.ru", "no-vi-ka", "no.vi.ka", LocalDate.of(2000, 03, 10));
-        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> controller.updateUser(userWithUpdates));
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> userStorage.updateUser(userWithUpdates));
         Assertions.assertEquals("Обновлённые данные о пользователе должны содержать положительный целочисленный Id.", exception.getMessage());
     }
 
@@ -153,8 +144,7 @@ public class UserControllerTest {
                 .name("no.vi.ka")
                 .birthday(LocalDate.of(2000, 03, 10))
                 .build();
-        //  User user = new User("no.vi.ka@yandex.ru", "no-vi-ka", "no.vi.ka", LocalDate.of(2000, 03, 10));
-        User defaultUser = controller.createUser(user);
+        User defaultUser = userStorage.createUser(user);
         User userWithUpdates = User.builder()
                 .id(-1)
                 .email("no.vi.ka@yandex.ru")
@@ -162,10 +152,7 @@ public class UserControllerTest {
                 .name("no.vi.ka")
                 .birthday(LocalDate.of(2000, 03, 10))
                 .build();
-//        User user = new User("no.vi.ka@yandex.ru", "no-vi-ka", "no.vi.ka", LocalDate.of(2000, 03, 10));
-//        User defaultUser = controller.createUser(user);
-//        User userWithUpdates = new User(-1, "no.vi.ka.2000@yandex.ru", "no-vi-ka", "no.vi.ka", LocalDate.of(2000, 03, 10));
-        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> controller.updateUser(userWithUpdates));
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> userStorage.updateUser(userWithUpdates));
         Assertions.assertEquals("Обновлённые данные о пользователе должны содержать положительный целочисленный Id.", exception.getMessage());
     }
 
@@ -177,8 +164,7 @@ public class UserControllerTest {
                 .name("no.vi.ka")
                 .birthday(LocalDate.of(2000, 03, 10))
                 .build();
-        //  User user = new User("no.vi.ka@yandex.ru", "no-vi-ka", "no.vi.ka", LocalDate.of(2000, 03, 10));
-        User defaultUser = controller.createUser(user);
+        User defaultUser = userStorage.createUser(user);
         User userWithUpdates = User.builder()
                 .id(3)
                 .email("no.vi.ka@yandex.ru")
@@ -186,10 +172,7 @@ public class UserControllerTest {
                 .name("no.vi.ka")
                 .birthday(LocalDate.of(2000, 03, 10))
                 .build();
-//        User user = new User("no.vi.ka@yandex.ru", "no-vi-ka", "no.vi.ka", LocalDate.of(2000, 03, 10));
-//        User defaultUser = controller.createUser(user);
-//        User userWithUpdates = new User(3, "no.vi.ka.2000@yandex.ru", "no-vi-ka", "no.vi.ka", LocalDate.of(2000, 03, 10));
-        NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> controller.updateUser(userWithUpdates));
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> userStorage.updateUser(userWithUpdates));
         Assertions.assertEquals("Пользователь с id = " + userWithUpdates.getId() + " не найден.", exception.getMessage());
     }
 }

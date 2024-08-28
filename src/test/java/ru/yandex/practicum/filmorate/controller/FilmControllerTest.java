@@ -5,12 +5,16 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 
 public class FilmControllerTest {
-
-    FilmController controller = new FilmController();
+    private final FilmStorage filmStorage = new InMemoryFilmStorage();
+    private final UserStorage userStorage = new InMemoryUserStorage();
 
     @Test
     public void shouldCreateNewFilmAndGiveItBack() {
@@ -20,9 +24,8 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(1997, 11, 01))
                 .duration(195)
                 .build();
-        //Film film = new Film("Titanic", "Film with DiCaprio", LocalDate.of(1997, 11, 01), 195);
-        Assertions.assertDoesNotThrow(() -> controller.createFilm(film));
-        Assertions.assertNotNull(controller.findAll());
+        Assertions.assertDoesNotThrow(() -> filmStorage.createFilm(film));
+        Assertions.assertNotNull(filmStorage.findAll());
     }
 
     @Test
@@ -33,8 +36,7 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(1997, 11, 01))
                 .duration(195)
                 .build();
-        //Film film = new Film("", "Film with DiCaprio", LocalDate.of(1997, 11, 01), 195);
-        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> controller.createFilm(film));
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> filmStorage.createFilm(film));
         Assertions.assertEquals("Название не может быть пустым.", exception.getMessage());
     }
 
@@ -46,8 +48,7 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(1997, 11, 01))
                 .duration(195)
                 .build();
-        //Film film = new Film("Titanic", "Film with DiCaprio, but length of description is more than 200. aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", LocalDate.of(1997, 11, 01), 195);
-        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> controller.createFilm(film));
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> filmStorage.createFilm(film));
         Assertions.assertEquals("Максимальная длина описания — 200 символов.", exception.getMessage());
     }
 
@@ -59,9 +60,8 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(1997, 11, 01))
                 .duration(195)
                 .build();
-        //Film film = new Film("Titanic", "Film with DiCaprio, but length of description is 200. aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", LocalDate.of(1997, 11, 01), 195);
         Assertions.assertEquals(200, film.getDescription().length());
-        Assertions.assertDoesNotThrow(() -> controller.createFilm(film));
+        Assertions.assertDoesNotThrow(() -> filmStorage.createFilm(film));
     }
 
     @Test
@@ -72,8 +72,7 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(1885, 11, 01))
                 .duration(195)
                 .build();
-       // Film film = new Film("Titanic", "Film with DiCaprio", LocalDate.of(1885, 11, 01), 195);
-        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> controller.createFilm(film));
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> filmStorage.createFilm(film));
         Assertions.assertEquals("Дата релиза — не раньше 28 декабря 1895 года.", exception.getMessage());
     }
 
@@ -85,8 +84,7 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(1895, 12, 28))
                 .duration(195)
                 .build();
-        //Film film = new Film("Titanic", "Film with DiCaprio", LocalDate.of(1895, 12, 28), 195);
-        Assertions.assertDoesNotThrow(() -> controller.createFilm(film));
+        Assertions.assertDoesNotThrow(() -> filmStorage.createFilm(film));
     }
 
     @Test
@@ -97,8 +95,7 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(1997, 11, 01))
                 .duration(0)
                 .build();
-       // Film film = new Film("Titanic", "Film with DiCaprio", LocalDate.of(1997, 11, 01), 0);
-        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> controller.createFilm(film));
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> filmStorage.createFilm(film));
         Assertions.assertEquals("Продолжительность фильма должна быть положительным числом.", exception.getMessage());
     }
 
@@ -110,8 +107,7 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(1997, 11, 01))
                 .duration(-195)
                 .build();
-        //Film film = new Film("Titanic", "Film with DiCaprio", LocalDate.of(1997, 11, 01), -195);
-        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> controller.createFilm(film));
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> filmStorage.createFilm(film));
         Assertions.assertEquals("Продолжительность фильма должна быть положительным числом.", exception.getMessage());
     }
 
@@ -123,8 +119,7 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(1997, 11, 01))
                 .duration(195)
                 .build();
-        //Film film = new Film("Titanic", "Film with DiCaprio", LocalDate.of(1997, 11, 01), 195);
-        Film defaultFilm = controller.createFilm(film);
+        Film defaultFilm = filmStorage.createFilm(film);
         Film filmWithUpdates = Film.builder()
                 .id(1)
                 .name("Titanic")
@@ -132,8 +127,7 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(1997, 11, 01))
                 .duration(195)
                 .build();
-        //Film filmWithUpdates = new Film(1, "Titanic", "Film with DiCaprio.", LocalDate.of(1997, 11, 01), 195);
-        Assertions.assertDoesNotThrow(() -> controller.updateFilm(filmWithUpdates));
+        Assertions.assertDoesNotThrow(() -> filmStorage.updateFilm(filmWithUpdates));
         Assertions.assertEquals(filmWithUpdates, defaultFilm);
     }
 
@@ -146,16 +140,14 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(1997, 11, 01))
                 .duration(195)
                 .build();
-        //Film film = new Film("Titanic", "Film with DiCaprio", LocalDate.of(1997, 11, 01), 195);
-        Film defaultFilm = controller.createFilm(film);
+        Film defaultFilm = filmStorage.createFilm(film);
         Film filmWithUpdates = Film.builder()
                 .name("Titanic")
                 .description("Film with DiCaprio.")
                 .releaseDate(LocalDate.of(1997, 11, 01))
                 .duration(195)
                 .build();
-        //Film filmWithUpdates = new Film(1, "Titanic", "Film with DiCaprio.", LocalDate.of(1997, 11, 01), 195);
-        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> controller.updateFilm(filmWithUpdates));
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> filmStorage.updateFilm(filmWithUpdates));
         Assertions.assertEquals("Обновлённые данные о фильме должны содержать положительный целочисленный Id.", exception.getMessage());
     }
 
@@ -167,8 +159,7 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(1997, 11, 01))
                 .duration(195)
                 .build();
-        //Film film = new Film("Titanic", "Film with DiCaprio", LocalDate.of(1997, 11, 01), 195);
-        Film defaultFilm = controller.createFilm(film);
+        Film defaultFilm = filmStorage.createFilm(film);
         Film filmWithUpdates = Film.builder()
                 .id(-1)
                 .name("Titanic")
@@ -176,8 +167,7 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(1997, 11, 01))
                 .duration(195)
                 .build();
-        //Film filmWithUpdates = new Film(1, "Titanic", "Film with DiCaprio.", LocalDate.of(1997, 11, 01), 195);
-        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> controller.updateFilm(filmWithUpdates));
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> filmStorage.updateFilm(filmWithUpdates));
         Assertions.assertEquals("Обновлённые данные о фильме должны содержать положительный целочисленный Id.", exception.getMessage());
     }
 
@@ -189,8 +179,7 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(1997, 11, 01))
                 .duration(195)
                 .build();
-        //Film film = new Film("Titanic", "Film with DiCaprio", LocalDate.of(1997, 11, 01), 195);
-        Film defaultFilm = controller.createFilm(film);
+        Film defaultFilm = filmStorage.createFilm(film);
         Film filmWithUpdates = Film.builder()
                 .id(3)
                 .name("Titanic")
@@ -198,8 +187,7 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(1997, 11, 01))
                 .duration(195)
                 .build();
-        //Film filmWithUpdates = new Film(1, "Titanic", "Film with DiCaprio.", LocalDate.of(1997, 11, 01), 195);
-        NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> controller.updateFilm(filmWithUpdates));
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> filmStorage.updateFilm(filmWithUpdates));
         Assertions.assertEquals("Пост с id = " + filmWithUpdates.getId() + " не найден.", exception.getMessage());
     }
 }

@@ -32,9 +32,7 @@ public class UserService {
             throw new NotFoundException("Пользователь с id = " + friendId + " не найден.");
         }
         User user = userStorage.getUserById(userId);
-        userStorage.checkUser(user);
         User friend = userStorage.getUserById(friendId);
-        userStorage.checkUser(friend);
         user.getFriendsId().add(friendId);
         friend.getFriendsId().add(userId);
     }
@@ -50,9 +48,7 @@ public class UserService {
             throw new NotFoundException("Пользователь с id = " + friendId + " не найден.");
         }
         User user = userStorage.getUserById(userId);
-        userStorage.checkUser(user);
         User friend = userStorage.getUserById(friendId);
-        userStorage.checkUser(friend);
         if (user.getFriendsId().contains(friendId)) {
             Set<Long> friendsSet1 = user.getFriendsId();
             friendsSet1.remove(friendId);
@@ -73,8 +69,7 @@ public class UserService {
         if (userStorage.getUserById(id) == null) {
             throw new NotFoundException("Пользователь с id = " + id + " не найден.");
         }
-        User user = userStorage.getUserById(id);
-        userStorage.checkUser(user);
+//        User user = userStorage.getUserById(id);
         List<User> friendsList = new ArrayList<>();
         Set<Long> friendsSet = userStorage.getUserById(id).getFriendsId();
         for (Long friendId : friendsSet) {
@@ -95,10 +90,8 @@ public class UserService {
             throw new NotFoundException("Пользователь с id = " + otherId + " не найден.");
         }
         List<User> commonFriends = new ArrayList<>();
-        User user1 = userStorage.getUserById(id);
-        userStorage.checkUser(user1);
-        User user2 = userStorage.getUserById(otherId);
-        userStorage.checkUser(user2);
+//        User user1 = userStorage.getUserById(id);
+//        User user2 = userStorage.getUserById(otherId);
         Set<Long> friendSet1 = userStorage.getUserById(id).getFriendsId();
         Set<Long> friendSet2 = userStorage.getUserById(otherId).getFriendsId();
         for (long userId : friendSet1) {

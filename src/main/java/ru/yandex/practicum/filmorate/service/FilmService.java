@@ -36,9 +36,7 @@ public class FilmService {
             throw new NotFoundException("Пользователь с id = " + id + " не найден.");
         }
         Film film = filmStorage.getFilmById(filmId);
-        filmStorage.checkFilm(film);
         User user = userStorage.getUserById(id);
-        userStorage.checkUser(user);
         film.getLikeCounts().add(id);
         user.getLikedFilmsId().add(filmId);
     }
@@ -55,9 +53,7 @@ public class FilmService {
             throw new NotFoundException("Пользователь с id = " + userId + " не найден.");
         }
         Film film = filmStorage.getFilmById(id);
-        filmStorage.checkFilm(film);
         User user = userStorage.getUserById(userId);
-        userStorage.checkUser(user);
         film.getLikeCounts().remove(userId);
         user.getLikedFilmsId().remove(id);
     }

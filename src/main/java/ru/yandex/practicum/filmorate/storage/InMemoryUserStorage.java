@@ -32,7 +32,15 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User getUserById(long id) {
         log.info("Обрабатывается GET запрос от клиента.");
-        return users.get(id);
+        if (id <= 0) {
+            throw new ValidationException("The id cannot be negative.");
+        }
+        if (!users.containsKey(id)) {
+            throw new NotFoundException("Фильм с id = " + id + " не найден.");
+        }
+        User user = users.get(id);
+        checkUser(user);
+        return user;
     }
 
     @Override

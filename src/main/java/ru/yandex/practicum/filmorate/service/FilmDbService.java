@@ -30,97 +30,67 @@ public class FilmDbService {
     private final FilmGenreStorage filmGenreStorage;
     private final FilmLikesStorage filmLikesStorage;
 
-    public List<Film> getAll() {
-        List<Film> films = filmStorage.getAll();
-
+    public List<Film> findAll() {
+        List<Film> films = filmStorage.findAll();
         Map<Long, Set<Genre>> mapFilmGenre = filmGenreStorage.findGenreOfFilm(films);
-
         films.forEach(film -> Optional.ofNullable(mapFilmGenre.get(film.getId()))
                 .ifPresent(film::addGenre)
         );
-
         log.info("Запрос на список всех фильмов выполнен.");
         return films;
     }
 
-    public Film create(Film film) {
+    public Film createFilm(Film film) {
         isValid(film);
-
-        // поиск жанров в таблице genres
         Set<Genre> genres = getGenresToFilm(film).stream()
                 .sorted(Comparator.comparing(Genre::getId, Comparator.naturalOrder()))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
-
-        // поиск MPA в таблице MPA
         MPARating mpa = getMPAtoFilm(film);
-
-        // запись film в таблицу с присвоением id
-        Film newFilm = filmStorage.create(film);
-
-        // запись в таблицу film_genres, изменение объекта film
+        Film newFilm = filmStorage.createFilm(film);
         filmGenreStorage.addGenreToFilm(newFilm, genres);
-
         newFilm.setMpa(mpa);
         newFilm.addGenre(genres);
-
         log.info("Фильм успешно добавлен: {}.", newFilm);
         return newFilm;
     }
 
-    public Film update(Film film) {
+    public Film updateFilm(Film film) {
         isValid(film);
         getFilmById(film.getId());
-
         filmGenreStorage.removeGenreFromFilm(film.getId());
-        filmStorage.update(film);
-
+        filmStorage.updateFilm(film);
         filmGenreStorage.addGenreToFilm(film, film.getGenres());
-
         log.info("Фильм успешно обновлен: {}.", film);
         return film;
     }
 
-    public Film deleteFilm(Long id) {
-        Film filmForDelete = getFilmById(id);
-
-        filmStorage.deleteFilm(id);
-
-        log.info("Фильм успешно удален: {}.", filmForDelete);
-        return filmForDelete;
-    }
-
     public Film getFilmById(Long filmId) {
-        Film findFilm = filmStorage.getFilm(filmId)
+        Film findFilm = filmStorage.getFilmById(filmId)
                 .orElseThrow(() -> new NotFoundException("Фильм с id: " + filmId + " не найден."));
-
         findFilm.addGenre(filmGenreStorage.findGenreOfFilm(List.of(findFilm))
                 .getOrDefault(filmId, Set.of())
         );
-
         log.info("Запрос по поиску фильма обработан. Найден фильм: {}.", findFilm);
         return findFilm;
     }
 
-    public void addFilmLike(Long filmId, Long userId) {
-        filmLikesStorage.addLikeFilm(filmId, userId);
+    public void addLike(Long filmId, Long userId) {
+        filmLikesStorage.addLike(filmId, userId);
         log.info("Пользователь с id: {} поставил 'like' фильму с id: {}.", userId, filmId);
     }
 
-    public void deleteFilmLike(Long filmId, Long userId) {
-        filmLikesStorage.deleteLikeFilm(filmId, userId);
+    public void deleteLike(Long filmId, Long userId) {
+        filmLikesStorage.deleteLike(filmId, userId);
         log.info("Пользователь с id: {} удалил 'like' у фильма с id: {}.", userId, filmId);
     }
 
-    public List<Film> getPopularFilms(Integer count) {
-        List<Film> films = filmStorage.getAllPopularFilm(count);
-
+    public List<Film> getMostLikedFilms(Integer count) {
+        List<Film> films = filmStorage.getMostLikedFilms(count);
         Map<Long, Set<Genre>> mapFilmsGenres = filmGenreStorage.findGenreOfFilm(films);
-
         films.forEach(film -> {
             Set<Genre> genres = mapFilmsGenres.getOrDefault(film.getId(), Set.of());
             film.addGenre(genres);
         });
-
         log.info("Запрос на получение популярных фильмов обработан.");
         return films;
     }
@@ -136,7 +106,6 @@ public class FilmDbService {
                 .map(genre -> genreStorage.getGenreById(genre.getId())
                         .orElseThrow(() -> new ValidationException("Указан несуществующий жанр.")))
                 .collect(Collectors.toSet());
-
         film.addGenre(genres);
         return genres;
     }
@@ -145,5 +114,12 @@ public class FilmDbService {
         int mpaID = film.getMpa().getId();
         return mpaRatingStorage.getMPAById(mpaID)
                 .orElseThrow(() -> new ValidationException("Указан несуществующий MPA рейтинг."));
+    }
+
+    public Film deleteFilm(Long id) {
+        Film filmForDelete = getFilmById(id);
+        filmStorage.deleteFilm(id);
+        log.info("Фильм успешно удален: {}.", filmForDelete);
+        return filmForDelete;
     }
 }

@@ -1,10 +1,11 @@
 package ru.yandex.practicum.filmorate.storage.mappers;
+
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.MPARating;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.ResultSet;
 
 @Component
 public class MPAMapper implements RowMapper<MPARating> {

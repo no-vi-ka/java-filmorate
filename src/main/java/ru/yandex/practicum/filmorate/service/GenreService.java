@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,14 +19,12 @@ public class GenreService {
     public Genre getGenreById(int id) {
         Genre genre = genreStorage.getGenreById(id)
                 .orElseThrow(() -> new NotFoundException("Жанр с id: " + id + " не найден."));
-
         log.info("Запрос по поиску жанра с id: {} обработан. Найден жанр: {}.", id, genre);
         return genre;
     }
 
-    public List<Genre> getAllGenre() {
+    public List<Genre> findAll() {
         List<Genre> genres = genreStorage.getAll();
-
         log.info("Запрос на получение списка всех жанров обработан. Найдены жанры: {}.", genres);
         return genres;
     }

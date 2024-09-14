@@ -1,13 +1,12 @@
 package ru.yandex.practicum.filmorate.storage.mappers;
 
-
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.MPARating;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.ResultSet;
 
 @Component
 public class FilmMapper implements RowMapper<Film> {
@@ -19,7 +18,8 @@ public class FilmMapper implements RowMapper<Film> {
                 .description(rs.getString("description"))
                 .duration(rs.getInt("duration"))
                 .releaseDate(rs.getDate("release_date").toLocalDate())
-                .mpa(MPARating.builder().id(rs.getInt("mpa_id")).name(rs.getString("mpa_name")).build())
+                .mpa(MPARating.builder().id(rs.getInt("mpa_id"))
+                        .name(rs.getString("mpa_name")).build())
                 .build();
     }
 }

@@ -1,19 +1,21 @@
 package ru.yandex.practicum.filmorate.storage.MPARating;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.model.MPARating;
+import ru.yandex.practicum.filmorate.storage.mappers.MPAMapper;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Optional;
+import java.sql.ResultSet;
+import java.util.List;
+
 
 @Repository("mpaDbStorage")
 @RequiredArgsConstructor
 public class MPARatingDbStorage implements MPARatingStorage {
-
+    private final MPAMapper mpaMapper;
     private final JdbcTemplate jdbcTemplate;
 
     @Override
@@ -29,10 +31,7 @@ public class MPARatingDbStorage implements MPARatingStorage {
         return jdbcTemplate.query("SELECT * FROM mpa_rating ORDER BY id", this::mapRowToMPA);
     }
 
-    private MPARating mapRowToMPA(ResultSet resultSet, int rowNum) throws SQLException {
-        return MPARating.builder()
-                .id(resultSet.getInt("id"))
-                .name(resultSet.getString("name"))
-                .build();
+    private MPARating mapRowToMPA(ResultSet rs, int rowNum) throws SQLException {
+        return mpaMapper.mapRow(rs, rowNum);
     }
 }

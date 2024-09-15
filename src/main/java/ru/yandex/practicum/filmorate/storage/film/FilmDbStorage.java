@@ -39,10 +39,8 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void deleteFilm(Long id) {
-        //Film deletedFilm = getFilmById(id).get();
         String sqlQuery = "DELETE FROM films WHERE id = ?";
         jdbcTemplate.update(sqlQuery, id);
-        //return deletedFilm;
     }
 
     @Override
@@ -71,6 +69,13 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query("SELECT f.*, mpa.name AS mpa_name " +
                 "FROM films f " +
                 "INNER JOIN mpa_rating AS mpa ON f.mpa_id = mpa.id", this::mapRowToFilm);
+    }
+
+    @Override
+    public boolean checkContainsFilmById(Long filmId) {
+        String sql = "SELECT COUNT(*) FROM films WHERE id = ?";
+        int count = jdbcTemplate.queryForObject(sql, Integer.class, filmId);
+        return count > 0;
     }
 
     public List<Film> getMostLikedFilms(int count) {

@@ -76,7 +76,7 @@ public class FilmGenreDbStorage implements FilmGenreStorage {
         if (genres == null) {
             return new LinkedHashSet<>();
         }
-        String sqlQuery = "DELETE FROM film_genres WHERE film_id = ?, genre_id = ?)";
+        String sqlQuery = "DELETE FROM film_genres WHERE film_id = ? AND genre_id = ?)";
         List<Genre> listOfGenre = new ArrayList<>(genres);
         jdbcTemplate.batchUpdate(sqlQuery, new BatchPreparedStatementSetter() {
             public void setValues(PreparedStatement ps, int i) throws SQLException {

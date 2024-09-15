@@ -14,7 +14,7 @@ public interface FilmStorage {
 
     Optional<Film> getFilmById(Long filmId);
 
-    Film deleteFilm(Long id);
+    void deleteFilm(Long id);
 
     List<Film> getMostLikedFilms(int count);
 }

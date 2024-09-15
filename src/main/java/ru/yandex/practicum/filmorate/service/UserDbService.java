@@ -95,9 +95,8 @@ public class UserDbService {
         }
     }
 
-    public User deleteUser(Long id) {
-        User user = getUserById(id);
-        log.info("Пользователь удален: {}.", user);
-        return userStorage.deleteUser(id);
+    public void deleteUser(Long id) {
+        userStorage.deleteUser(id);
+        log.info("Пользователь с id={} удален.", id);
     }
 }

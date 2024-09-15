@@ -65,10 +65,8 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User deleteUser(Long id) {
-        User user = getUserById(id).get();
+    public void deleteUser(Long id) {
         jdbcTemplate.update("DELETE FROM users WHERE id = ?", id);
-        return user;
     }
 
     private User mapRowToUser(ResultSet rs, int rowNum) throws SQLException {

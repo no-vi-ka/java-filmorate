@@ -38,11 +38,11 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Film deleteFilm(Long id) {
-        Film deletedFilm = getFilmById(id).get();
+    public void deleteFilm(Long id) {
+        //Film deletedFilm = getFilmById(id).get();
         String sqlQuery = "DELETE FROM films WHERE id = ?";
         jdbcTemplate.update(sqlQuery, id);
-        return deletedFilm;
+        //return deletedFilm;
     }
 
     @Override

@@ -116,10 +116,11 @@ public class FilmDbService {
                 .orElseThrow(() -> new ValidationException("Указан несуществующий MPA рейтинг."));
     }
 
-    public Film deleteFilm(Long id) {
-        Film filmForDelete = getFilmById(id);
+    public void deleteFilm(Long id) {
+        //Film filmForDelete = getFilmById(id);
         filmStorage.deleteFilm(id);
-        log.info("Фильм успешно удален: {}.", filmForDelete);
-        return filmForDelete;
+
+        log.info("Фильм с id={} успешно удален.", id);
+        //return filmForDelete;
     }
 }

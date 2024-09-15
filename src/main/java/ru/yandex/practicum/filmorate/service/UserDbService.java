@@ -65,19 +65,21 @@ public class UserDbService {
     }
 
     public List<User> getAllFriends(Long userId) {
-        getUserById(userId);
-        List<User> friends = friendshipDbStorage.getUserFriends(userId);
-        log.info("Запрос на получение списка друзей пользователя с id: {} выполнен. Список друзей: {}.",
-                userId, friends);
-        return friends;
+       if (!userStorage.checkContainsUserById(userId)) {
+           throw new NotFoundException("Пользователь с id: " + userId + " не найден.");
+       }
+    return friendshipDbStorage.getUserFriends(userId);
     }
 
     public List<User> getCommonFriends(Long userId, Long friendId) {
-        getUserById(userId);
-        getUserById(friendId);
-        List<User> commonFriends = friendshipDbStorage.getCommonFriends(userId, friendId);
-        log.info("Запрос на получение общих друзей пользователя № {} и № {} выполнен.", userId, friendId);
-        return commonFriends;
+        if (!userStorage.checkContainsUserById(userId)) {
+            throw new NotFoundException("Пользователь с id: " + userId + " не найден.");
+        }
+        if (!userStorage.checkContainsUserById(friendId)) {
+            throw new NotFoundException("Пользователь с id: " + friendId + " не найден.");
+        }
+            return friendshipDbStorage.getCommonFriends(userId, friendId);
+
     }
 
     private void setNameIfNotPresent(User user) {

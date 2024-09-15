@@ -117,10 +117,7 @@ public class FilmDbService {
     }
 
     public void deleteFilm(Long id) {
-        //Film filmForDelete = getFilmById(id);
         filmStorage.deleteFilm(id);
-
         log.info("Фильм с id={} успешно удален.", id);
-        //return filmForDelete;
     }
 }

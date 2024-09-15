@@ -69,6 +69,13 @@ public class UserDbStorage implements UserStorage {
         jdbcTemplate.update("DELETE FROM users WHERE id = ?", id);
     }
 
+    @Override
+    public boolean checkContainsUserById(Long userId) {
+        String sql = "SELECT COUNT(*) FROM users WHERE id = ?";
+        int count = jdbcTemplate.queryForObject(sql, Integer.class, userId);
+        return count > 0;
+    }
+
     private User mapRowToUser(ResultSet rs, int rowNum) throws SQLException {
         return userMapper.mapRow(rs, rowNum);
     }

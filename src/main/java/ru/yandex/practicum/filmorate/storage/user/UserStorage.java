@@ -15,4 +15,6 @@ public interface UserStorage {
     Optional<User> getUserById(Long id);
 
     void deleteUser(Long id);
+
+    boolean checkContainsUserById(Long userId);
 }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 
 import java.util.stream.Collectors;
 import java.sql.PreparedStatement;
@@ -17,7 +18,7 @@ import java.util.*;
 @Repository("filmGenreDbStorage")
 @RequiredArgsConstructor
 public class FilmGenreDbStorage implements FilmGenreStorage {
-
+private final GenreStorage genreStorage;
     private final JdbcTemplate jdbcTemplate;
 
     @Override
@@ -41,28 +42,46 @@ public class FilmGenreDbStorage implements FilmGenreStorage {
     }
 
     @Override
-    public Map<Long, Set<Genre>> findGenreOfFilm(List<Film> films) {
-        Map<Long, Set<Genre>> genres = new HashMap<>();
-        List<Long> filmIds = films.stream().map(Film::getId).collect(Collectors.toList());
-        String placeholders = String.join(",", Collections.nCopies(filmIds.size(), "?"));
-        String sqlQuery = String.format("SELECT fg.film_id, fg.genre_id, g.name " +
-                "FROM film_genres fg " +
-                "LEFT JOIN genres g ON fg.genre_id = g.id " +
-                "WHERE film_id IN (%s) " +
-                "ORDER BY fg.film_id, fg.genre_id", placeholders);
-        SqlRowSet rs = jdbcTemplate.queryForRowSet(sqlQuery, filmIds.toArray());
-
-        while (rs.next()) {
-            long filmID = rs.getInt("film_id");
-            Genre genre = Genre.builder()
-                    .id(rs.getInt("genre_id"))
-                    .name(rs.getString("name"))
-                    .build();
-            genres.computeIfAbsent(filmID, k -> new LinkedHashSet<>()).add(genre);
+    public Set<Genre> findGenreOfFilm(Film film) {
+        Set<Genre> toReturn = new LinkedHashSet<>();
+        List<Genre> allGenres = genreStorage.getAll();
+        Map<Integer, Genre> genreMap = new HashMap<>();
+        for (Genre genre : allGenres) {
+            genreMap.put(genre.getId(), genre);
         }
+        Long filmId = film.getId();
+        String sqlQuery = "SELECT genre_id FROM film_genres WHERE film_id = ?";
+        List<Integer> filmGenresId = jdbcTemplate.queryForList(sqlQuery, new Object[]{filmId}, Integer.class);
+        for (Integer genreId : filmGenresId) {
+            toReturn.add(genreMap.get(genreId));
+        }
+        return toReturn;
+}
 
-        return genres;
-    }
+
+
+
+//        Map<Long, Set<Genre>> genres = new HashMap<>();
+//        List<Long> filmIds = films.stream().map(Film::getId).collect(Collectors.toList());
+//        String placeholders = String.join(",", Collections.nCopies(filmIds.size(), "?"));
+//        String sqlQuery = String.format("SELECT fg.film_id, fg.genre_id, g.name " +
+//                "FROM film_genres fg " +
+//                "LEFT JOIN genres g ON fg.genre_id = g.id " +
+//                "WHERE film_id IN (%s) " +
+//                "ORDER BY fg.film_id, fg.genre_id", placeholders);
+//        SqlRowSet rs = jdbcTemplate.queryForRowSet(sqlQuery, filmIds.toArray());
+//
+//        while (rs.next()) {
+//            long filmID = rs.getInt("film_id");
+//            Genre genre = Genre.builder()
+//                    .id(rs.getInt("genre_id"))
+//                    .name(rs.getString("name"))
+//                    .build();
+//            genres.computeIfAbsent(filmID, k -> new LinkedHashSet<>()).add(genre);
+//        }
+//
+//        return genres;
+
 
     @Override
     public void removeGenreFromFilm(long id) {

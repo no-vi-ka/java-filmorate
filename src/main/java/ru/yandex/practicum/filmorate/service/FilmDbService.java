@@ -32,10 +32,10 @@ public class FilmDbService {
 
     public List<Film> findAll() {
         List<Film> films = filmStorage.findAll();
-        Map<Long, Set<Genre>> mapFilmGenre = filmGenreStorage.findGenreOfFilm(films);
-        films.forEach(film -> Optional.ofNullable(mapFilmGenre.get(film.getId()))
-                .ifPresent(film::addGenre)
-        );
+//        Map<Long, Set<Genre>> mapFilmGenre = filmGenreStorage.findGenreOfFilm(films);
+//        films.forEach(film -> Optional.ofNullable(mapFilmGenre.get(film.getId()))
+//                .ifPresent(film::addGenre)
+//        );
         log.info("Запрос на список всех фильмов выполнен.");
         return films;
     }
@@ -67,9 +67,9 @@ public class FilmDbService {
     public Film getFilmById(Long filmId) {
         Film findFilm = filmStorage.getFilmById(filmId)
                 .orElseThrow(() -> new NotFoundException("Фильм с id: " + filmId + " не найден."));
-        findFilm.addGenre(filmGenreStorage.findGenreOfFilm(List.of(findFilm))
-                .getOrDefault(filmId, Set.of())
-        );
+        findFilm.addGenre(filmGenreStorage.findGenreOfFilm(findFilm));
+//                .getOrDefault(filmId, Set.of())
+//        );
         log.info("Запрос по поиску фильма обработан. Найден фильм: {}.", findFilm);
         return findFilm;
     }
@@ -86,11 +86,11 @@ public class FilmDbService {
 
     public List<Film> getMostLikedFilms(Integer count) {
         List<Film> films = filmStorage.getMostLikedFilms(count);
-        Map<Long, Set<Genre>> mapFilmsGenres = filmGenreStorage.findGenreOfFilm(films);
-        films.forEach(film -> {
-            Set<Genre> genres = mapFilmsGenres.getOrDefault(film.getId(), Set.of());
-            film.addGenre(genres);
-        });
+//        Map<Long, Set<Genre>> mapFilmsGenres = filmGenreStorage.findGenreOfFilm(films);
+//        films.forEach(film -> {
+//            Set<Genre> genres = mapFilmsGenres.getOrDefault(film.getId(), Set.of());
+//            film.addGenre(genres);
+//        });
         log.info("Запрос на получение популярных фильмов обработан.");
         return films;
     }

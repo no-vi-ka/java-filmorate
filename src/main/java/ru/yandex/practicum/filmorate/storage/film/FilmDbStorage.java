@@ -20,7 +20,6 @@ import java.util.*;
 public class FilmDbStorage implements FilmStorage {
     private final FilmMapper filmMapper;
     private final JdbcTemplate jdbcTemplate;
-    private final NamedParameterJdbcOperations jdbc;
 
     @Override
     public Film createFilm(Film film) {

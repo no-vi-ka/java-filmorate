@@ -89,11 +89,8 @@ public class UserDbService {
     }
 
     private void checkEmailIsAlreadyInUse(User user) {
-        boolean checkOnExist = userStorage.findAll().stream()
-                .anyMatch(u -> u.getEmail().equals(user.getEmail()));
-        if (checkOnExist) {
-            log.warn("Ошибка при выполнении запроса. Email {} занят.", user.getEmail());
-            throw new ValidationException("Email " + user.getEmail() + " занят.");
+        if (userStorage.checkEmailIsAlreadyInUse(user)) {
+            throw new ValidationException("Email занят.");
         }
     }
 

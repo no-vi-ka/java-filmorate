@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
+import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 import ru.yandex.practicum.filmorate.model.User;
@@ -73,6 +74,13 @@ public class UserDbStorage implements UserStorage {
     public boolean checkContainsUserById(Long userId) {
         String sql = "SELECT COUNT(*) FROM users WHERE id = ?";
         int count = jdbcTemplate.queryForObject(sql, Integer.class, userId);
+        return count > 0;
+    }
+
+    @Override
+    public boolean checkEmailIsAlreadyInUse(User user) {
+        String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
+        int count = jdbcTemplate.queryForObject(sql, Integer.class, user.getEmail());
         return count > 0;
     }
 

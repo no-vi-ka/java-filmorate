@@ -17,4 +17,6 @@ public interface UserStorage {
     void deleteUser(Long id);
 
     boolean checkContainsUserById(Long userId);
+
+    boolean checkEmailIsAlreadyInUse(User user);
 }

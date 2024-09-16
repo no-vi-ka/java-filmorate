@@ -1,13 +1,10 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
 public class ErrorResponse {
-    String description;
-
-    public ErrorResponse(String description) {
-        this.description = description;
-    }
-
-    public String getDescription() {
-        return description;
-    }
+    String message;
 }

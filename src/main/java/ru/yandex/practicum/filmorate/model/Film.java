@@ -1,27 +1,33 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.*;
+import jakarta.validation.constraints.*;
 
+import java.util.LinkedHashSet;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
 
 @Data
 @Builder(toBuilder = true)
 public class Film {
-    private long id;
+    private final long id;
+    @NotBlank
     private String name;
+    @Size(min = 1, max = 200)
     private String description;
+    @NotNull
     private LocalDate releaseDate;
+    @NotNull
+    @Positive
     private int duration;
-    private Set<Long> likeCounts;
+    @NotNull
+    private MPARating mpa;
+    private final Set<Genre> genres = new LinkedHashSet<>();
+    @Getter
+    private Set<Long> likes;
 
-    public Film(long id, String name, String description, LocalDate releaseDate, int duration, Set<Long> likeCounts) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-        this.likeCounts = new HashSet<>();
+    public void addGenre(Set<Genre> genres) {
+        this.genres.addAll(genres);
     }
 }
+

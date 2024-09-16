@@ -32,26 +32,27 @@ public class FilmDbService {
 
     public List<Film> findAll() {
         List<Film> films = filmStorage.findAll();
-//        Map<Long, Set<Genre>> mapFilmGenre = filmGenreStorage.findGenreOfFilm(films);
-//        films.forEach(film -> Optional.ofNullable(mapFilmGenre.get(film.getId()))
-//                .ifPresent(film::addGenre)
-//        );
         log.info("Запрос на список всех фильмов выполнен.");
         return films;
     }
 
     public Film createFilm(Film film) {
         isValid(film);
-        Set<Genre> genres = getGenresToFilm(film).stream()
-                .sorted(Comparator.comparing(Genre::getId, Comparator.naturalOrder()))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        Set<Genre> genres = film.getGenres();
         MPARating mpa = getMPAtoFilm(film);
         Film newFilm = filmStorage.createFilm(film);
-        filmGenreStorage.addGenreToFilm(newFilm, genres);
+        try {
+            filmGenreStorage.addGenreToFilm(newFilm, genres);
+        } catch (RuntimeException e) {
+            throw new ValidationException("Задан неверный жанр.");
+        }
         newFilm.setMpa(mpa);
         newFilm.addGenre(genres);
+
         log.info("Фильм успешно добавлен: {}.", newFilm);
         return newFilm;
+
     }
 
     public Film updateFilm(Film film) {
@@ -68,8 +69,6 @@ public class FilmDbService {
         Film findFilm = filmStorage.getFilmById(filmId)
                 .orElseThrow(() -> new NotFoundException("Фильм с id: " + filmId + " не найден."));
         findFilm.addGenre(filmGenreStorage.findGenreOfFilm(findFilm));
-//                .getOrDefault(filmId, Set.of())
-//        );
         log.info("Запрос по поиску фильма обработан. Найден фильм: {}.", findFilm);
         return findFilm;
     }
@@ -86,11 +85,6 @@ public class FilmDbService {
 
     public List<Film> getMostLikedFilms(Integer count) {
         List<Film> films = filmStorage.getMostLikedFilms(count);
-//        Map<Long, Set<Genre>> mapFilmsGenres = filmGenreStorage.findGenreOfFilm(films);
-//        films.forEach(film -> {
-//            Set<Genre> genres = mapFilmsGenres.getOrDefault(film.getId(), Set.of());
-//            film.addGenre(genres);
-//        });
         log.info("Запрос на получение популярных фильмов обработан.");
         return films;
     }
@@ -99,15 +93,6 @@ public class FilmDbService {
         if (film.getReleaseDate().isBefore(FIRST_FILM)) {
             throw new ValidationException(String.format("Ошибка валидации, неверная дата релиза %s.", film.getName()));
         }
-    }
-
-    private Set<Genre> getGenresToFilm(Film film) {
-        Set<Genre> genres = film.getGenres().stream()
-                .map(genre -> genreStorage.getGenreById(genre.getId())
-                        .orElseThrow(() -> new ValidationException("Указан несуществующий жанр.")))
-                .collect(Collectors.toSet());
-        film.addGenre(genres);
-        return genres;
     }
 
     private MPARating getMPAtoFilm(Film film) {

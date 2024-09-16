@@ -10,10 +10,15 @@ import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPARating;
+import ru.yandex.practicum.filmorate.service.FilmDbService;
+import ru.yandex.practicum.filmorate.storage.MPARating.MPARatingDbStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.filmGenre.FilmGenreDbStorage;
+import ru.yandex.practicum.filmorate.storage.filmLikes.FilmLikesDbStorage;
+import ru.yandex.practicum.filmorate.storage.genre.GenreDbStorage;
 import ru.yandex.practicum.filmorate.storage.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.storage.mappers.GenreMapper;
+import ru.yandex.practicum.filmorate.storage.mappers.MPAMapper;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -24,12 +29,13 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @JdbcTest
-@Import({FilmDbStorage.class, FilmGenreDbStorage.class, GenreMapper.class, FilmMapper.class})
+@Import({FilmDbStorage.class, FilmGenreDbStorage.class, FilmDbService.class, GenreDbStorage.class, MPARatingDbStorage.class, MPAMapper.class, FilmLikesDbStorage.class, GenreMapper.class, FilmMapper.class})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class FilmGenreStorageTest {
     private final FilmGenreDbStorage filmGenreDbStorage;
     private final FilmDbStorage filmDbStorage;
+    private final FilmDbService filmDbService;
     private static final int TEST_GENRE_ID = 2;
     private static final Long TEST_FILM_ID_1 = Long.valueOf(1);
 
@@ -48,11 +54,10 @@ public class FilmGenreStorageTest {
                 .duration(200)
                 .build();
         film.setMpa(mpa);
-        Film created = filmDbStorage.createFilm(film);
         film.addGenre(genresToAdd);
+        Film created = filmDbStorage.createFilm(film);
         filmGenreDbStorage.addGenreToFilm(created, genresToAdd);
-        Map<Long, Set<Genre>> setOfFilmIdAndGenres = filmGenreDbStorage.findGenreOfFilm(List.of(created));
-        int check = setOfFilmIdAndGenres.values().size();
+        int check = filmDbService.getFilmById(created.getId()).getGenres().size();
         assertThat(genresToAdd.size()).isEqualTo(check);
     }
 }

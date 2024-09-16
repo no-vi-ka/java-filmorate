@@ -65,10 +65,10 @@ public class UserDbService {
     }
 
     public List<User> getAllFriends(Long userId) {
-       if (!userStorage.checkContainsUserById(userId)) {
-           throw new NotFoundException("Пользователь с id: " + userId + " не найден.");
-       }
-    return friendshipDbStorage.getUserFriends(userId);
+        if (!userStorage.checkContainsUserById(userId)) {
+            throw new NotFoundException("Пользователь с id: " + userId + " не найден.");
+        }
+        return friendshipDbStorage.getUserFriends(userId);
     }
 
     public List<User> getCommonFriends(Long userId, Long friendId) {
@@ -78,8 +78,7 @@ public class UserDbService {
         if (!userStorage.checkContainsUserById(friendId)) {
             throw new NotFoundException("Пользователь с id: " + friendId + " не найден.");
         }
-            return friendshipDbStorage.getCommonFriends(userId, friendId);
-
+        return friendshipDbStorage.getCommonFriends(userId, friendId);
     }
 
     private void setNameIfNotPresent(User user) {

@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
-import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 import ru.yandex.practicum.filmorate.model.User;

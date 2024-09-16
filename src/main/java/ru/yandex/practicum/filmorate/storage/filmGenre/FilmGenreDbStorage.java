@@ -8,7 +8,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 
-import java.util.stream.Collectors;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
@@ -51,27 +50,6 @@ public class FilmGenreDbStorage implements FilmGenreStorage {
             toReturn.add(genreMap.get(genreId));
         }
         return toReturn;
-    }
-
-    @Override
-    public List<Film> findGenreOfFilms(List<Film> films) {
-        Map<Integer, Genre> genreMap = getAllGenreMap();
-        String sql = "SELECT film_id FROM films";
-        List<Long> filmsIds = jdbcTemplate.queryForList(sql, Long.class);
-        String sql1 = "SELECT film_id, genre_id FROM film_genres GROUP BY film_id";
-        HashMap<Long, List<Integer>> connect = jdbcTemplate.queryForObject(sql1, HashMap.class);
-        Set<Genre> genresToAdd = new HashSet<>();
-        for (Film film : films) {
-            Long filmId = film.getId();
-            genresToAdd.clear();
-            List<Integer> genresIdForFilm = connect.get(filmId);
-            for (Integer genreId : genresIdForFilm) {
-                Genre genreToAdd = genreMap.get(genreId);
-                genresToAdd.add(genreToAdd);
-            }
-            film.addGenre(genresToAdd);
-        }
-        return films;
     }
 
     @Override
